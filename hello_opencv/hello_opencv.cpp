@@ -9,7 +9,6 @@ using namespace cv;
 
 
 
-
 int main()
 {
     /*
@@ -20,14 +19,10 @@ int main()
 	destroyAllWindows();
     */
     // 图片路径
-	string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\4-21\\2022-04-21T17_00_26+08_00\\proc.jpg";
+	string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\4-21\\2022-04-21T17_00_26+08_00\\";
+    string imageFileName = "proc.jpg";
 
 
-    Mat src = imread(imagePath, IMREAD_GRAYSCALE);
-
-	imshow("输入窗口", src);
-	waitKey(0);
-	destroyAllWindows();
 
 
 
@@ -35,13 +30,14 @@ int main()
 
     system("color F0");  //更改输出界面颜色
     //对图像进行距离变换
-    Mat img = imread(imagePath);
+    Mat img = imread(imagePath + imageFileName);
     if (img.empty())
     {
         cout << "请确认图像文件名称是否正确" << endl;
         return -1;
     }
-    imshow(imagePath, img);
+    imshow(imagePath + imageFileName, img);
+
     Mat leaves, leavesBW;
 
     //将图像转成二值图像，用于统计连通域
@@ -64,9 +60,14 @@ int main()
     // 生成文件
     // 
     //以不同颜色标记出不同的连通域
-    Mat result = Mat::zeros(leaves.size(), img.type());
-    int w = result.cols;
-    int h = result.rows;
+    //Mat result = Mat::zeros(leaves.size(), img.type());
+	
+    //int w = result.cols;
+    //int h = result.rows;
+    Mat temp_stats;
+    cv::sort(stats, temp_stats, );
+    // 对temp_stats安装area的大小进行排序
+    
     for (int i = 1; i < number; i++)
     {
         // 中心位置
@@ -78,7 +79,9 @@ int main()
         int w = stats.at<int>(i, CC_STAT_WIDTH);
         int h = stats.at<int>(i, CC_STAT_HEIGHT);
         int area = stats.at<int>(i, CC_STAT_AREA);
-
+        
+        cout << sort(stats, temp_) << endl;
+/*
         // 中心位置绘制
         circle(img, Point(center_x, center_y), 2, Scalar(0, 255, 0), 2, 8, 0);
         // 外接矩形
@@ -89,19 +92,27 @@ int main()
         cout << "number: " << i << ",area: " << area << endl;
 
 
+		
+        // 新建一个文件流记录数据
+		ofstream outfile;
+		outfile.open(imagePath + "proc.csv", ios::app); // ios::app如果没有文件，生成空文件，如果存在文件，就在文件尾追加
+        // // 按照连通域面积对stats进行排序
+		// sortIdx(stats.col(CC_STAT_AREA), stats.col(CC_STAT_AREA), SORT_EVERY_COLUMN + SORT_DESCENDING);
+	    outfile << "number: " << i << ",area: " << area  << 
+            ",x: " << x <<
+            ",y: " << y <<
+			",w: " << w <<
+			",h: " << h << endl;
+        
+*/
     }
     //显示结果
     imshow("标记后的图像", img);
 
+    imwrite(imagePath + "proc2.jpg", img);
+
     waitKey(0);
     return 0;
-
-
-
-
-
-
-
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
