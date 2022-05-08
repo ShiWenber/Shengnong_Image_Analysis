@@ -9,6 +9,35 @@ using namespace cv;
 
 
 
+Mat sortrows(Mat src, Mat& dst, int sort_col) {
+    Mat input = src.clone();
+    // 用冒泡排序暴力排序mat
+    for (int i = 0; i < input.rows; i++) {
+        for (int j = 0; j < input.rows - i - 1; j++) {
+            if (input.at<int>(j, sort_col) < input.at<int>(j + 1, sort_col)) {
+                Mat temp = input.row(j + 1).clone();
+                input.row(j).copyTo(input.row(j + 1));
+                temp.row(0).copyTo(input.row(j));
+            }
+        }
+    }
+    dst = input.clone();
+    return input;
+
+}
+
+
+Mat combineStats(Mat src, Mat& dst, float threshold = 0) {
+    Mat input = src.clone();
+    for (int i = 0; i < input.rows; i++) {
+        for (int j = i + 1; i < input.rows; i++)
+			
+    }
+
+
+}
+	
+
 int main()
 {
     /*
@@ -64,10 +93,10 @@ int main()
 	
     //int w = result.cols;
     //int h = result.rows;
-    Mat temp_stats;
-    cv::sort(stats, temp_stats, );
-    // 对temp_stats安装area的大小进行排序
+    sortrows(stats, stats, CC_STAT_AREA);
+    cout << stats << endl;
     
+    // 最大连通域是全部图像，因此最大面积或者stats第一行要去除
     for (int i = 1; i < number; i++)
     {
         // 中心位置
@@ -79,32 +108,37 @@ int main()
         int w = stats.at<int>(i, CC_STAT_WIDTH);
         int h = stats.at<int>(i, CC_STAT_HEIGHT);
         int area = stats.at<int>(i, CC_STAT_AREA);
-        
-        cout << sort(stats, temp_) << endl;
-/*
+
+		
+		// 画框之前先遍历矩阵查找是否存在可以合并的内容
+
         // 中心位置绘制
-        circle(img, Point(center_x, center_y), 2, Scalar(0, 255, 0), 2, 8, 0);
+        //circle(img, Point(center_x, center_y), 2, Scalar(0, 255, 0), 2, 8, 0);
+        circle(img, Point(center_x, center_y), 2, colors[i], 2, 8, 0);
         // 外接矩形
         Rect rect(x, y, w, h);
         rectangle(img, rect, colors[i], 1, 8, 0);
+        //putText(img, format("%d", i + 1), Point(center_x, center_y),
+        //    FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 255), 1);
         putText(img, format("%d", i), Point(center_x, center_y),
-            FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 255), 1);
-        cout << "number: " << i << ",area: " << area << endl;
+            FONT_HERSHEY_SIMPLEX, 0.5,colors[i], 1);
+
+
+        cout << "number: " << i + 1 << ",area: " << area << endl;
 
 
 		
         // 新建一个文件流记录数据
 		ofstream outfile;
 		outfile.open(imagePath + "proc.csv", ios::app); // ios::app如果没有文件，生成空文件，如果存在文件，就在文件尾追加
-        // // 按照连通域面积对stats进行排序
-		// sortIdx(stats.col(CC_STAT_AREA), stats.col(CC_STAT_AREA), SORT_EVERY_COLUMN + SORT_DESCENDING);
+
 	    outfile << "number: " << i << ",area: " << area  << 
             ",x: " << x <<
             ",y: " << y <<
 			",w: " << w <<
 			",h: " << h << endl;
         
-*/
+
     }
     //显示结果
     imshow("标记后的图像", img);
