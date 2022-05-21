@@ -197,7 +197,7 @@ Mat displayImage(Mat img, Mat stats) {
 }
 
 
-int main()
+int main(int argc, string argv[])
 {
     /*
     Mat src = imread("C:\\Users\\shiwenbo\\OneDrive\\images\\proc.jpg", IMREAD_GRAYSCALE);
@@ -207,7 +207,8 @@ int main()
 	destroyAllWindows();
     */
     // 图片路径
-	string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\4-21\\2022-04-21T17_00_26+08_00\\";
+	// string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\4-21\\2022-04-21T17_00_26+08_00\\";
+    string imagePath = argv[1];
     string imageFileName = "proc.jpg";
 
 
