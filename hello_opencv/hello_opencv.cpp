@@ -8,8 +8,9 @@ using namespace std;
 using namespace cv;
 
 vector<Vec3b> colors;
-void displayImage(Mat, Mat);
+Mat displayImage(Mat, Mat);
 int imageId = 1;
+void statsWrite(string, Mat);
 
 
 Mat removeRow(Mat src, Mat& dst, int row) {
@@ -21,12 +22,16 @@ Mat removeRow(Mat src, Mat& dst, int row) {
     Mat res2;
     Mat input = src.clone();
     input(Range(0, row), Range(0, input.cols)).copyTo(res1);
-    input(Range(row + 1, input.rows), Range(0, input.cols)).copyTo(res2);
-
-    // 合并两块
-    vconcat(res1, res2, res1);
-    dst = res1.clone();
-
+    // 如果res2行数为0，合并就会报错
+    if (row + 1 < input.rows) {
+        input(Range(row + 1, input.rows), Range(0, input.cols)).copyTo(res2);
+        // 合并两块
+        vconcat(res1, res2, res1);
+        dst = res1.clone();
+    } else {
+        dst = res1.clone();
+        
+    }
     return res1;
 
 }
@@ -74,7 +79,7 @@ Mat combineStats(Mat src, Mat& dst, Mat img, float threshold = 0) {
                 int y = min(y1, y2);
                 int w = max(x1 + w1, x2 + w2) - x;
                 int h = max(y1 + h1, y2 + h2) - y;
-                int area = w * h;
+                int area = area1 + area2;
                 input.at<int>(i, CC_STAT_LEFT) = x;
                 input.at<int>(i, CC_STAT_TOP) = y;
                 input.at<int>(i, CC_STAT_WIDTH) = w;
@@ -94,7 +99,7 @@ Mat combineStats(Mat src, Mat& dst, Mat img, float threshold = 0) {
                 area1 = area;
 
                 j--; // 复位
-                displayImage(img, input);
+                // displayImage(img, input); // 测试使用
             }
 
 
@@ -122,7 +127,27 @@ Mat sortrows(Mat src, Mat& dst, int sort_col) {
     return input;
 
 }
-void displayImage(Mat img, Mat stats) {
+
+void statsWrite(string filepath, Mat stats) {
+    // 新建一个文件流记录数据
+	ofstream outfile;
+	outfile.open(filepath, ios::out); // 创建或者覆盖文件
+    // 表头
+    outfile << "id" << ", " << "area" << "," << "x" << ", " << "y" << ", " << "w" << ", " << "h" << endl;
+    for (int i = 1; i < stats.rows; i++) {
+        int x = stats.at<int>(i, CC_STAT_LEFT);
+        int y = stats.at<int>(i, CC_STAT_TOP);
+        int w = stats.at<int>(i, CC_STAT_WIDTH);
+        int h = stats.at<int>(i, CC_STAT_HEIGHT);
+        int area = stats.at<int>(i, CC_STAT_AREA);
+
+        outfile << i << ", " << area << "," << x << ", " << y << ", " << w << ", " << h << endl;
+
+    }
+    outfile.close();
+}
+
+Mat displayImage(Mat img, Mat stats) {
     Mat temp_img = img.clone();
     int number = stats.rows;
     sortrows(stats, stats, CC_STAT_AREA);
@@ -167,6 +192,7 @@ void displayImage(Mat img, Mat stats) {
     imshow(to_string(imageId++), temp_img);
 
     waitKey(0);
+    return temp_img;
 
 }
 
@@ -270,6 +296,7 @@ int main()
             ",y: " << y <<
 			",w: " << w <<
 			",h: " << h << endl;
+        outfile.close();
         
 
     }
@@ -282,6 +309,13 @@ int main()
 
     Mat temp;
     combineStats(stats, temp,originImage, 0);
+    sortrows(temp, temp, CC_STAT_AREA);
+    Mat resImg = displayImage(originImage, temp);
+    // 保存结果图
+    imwrite(imagePath + "proc3.jpg", resImg);
+    // 保存结果stats联通情况
+    statsWrite(imagePath + "combined_stats.csv", temp);
+
 
 	
 
