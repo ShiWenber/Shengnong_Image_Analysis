@@ -197,7 +197,7 @@ Mat displayImage(Mat img, Mat stats) {
 }
 
 
-int main(int argc, string argv[])
+int main(int argc, char **argv)
 {
     /*
     Mat src = imread("C:\\Users\\shiwenbo\\OneDrive\\images\\proc.jpg", IMREAD_GRAYSCALE);
@@ -207,8 +207,11 @@ int main(int argc, string argv[])
 	destroyAllWindows();
     */
     // 图片路径
-	// string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\4-21\\2022-04-21T17_00_26+08_00\\";
-    string imagePath = argv[1];
+	// string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\2022-04-21\\2022-04-21T17_00_26+08_00\\";
+    string imagePath;
+    imagePath = argv[1];
+    cout << imagePath << endl;
+	
     string imageFileName = "proc.jpg";
 
 
@@ -220,6 +223,7 @@ int main(int argc, string argv[])
     system("color F0");  //更改输出界面颜色
     //对图像进行距离变换
     Mat img = imread(imagePath + imageFileName);
+    cout << img << endl;
     Mat originImage = img.clone();
     if (img.empty())
     {
