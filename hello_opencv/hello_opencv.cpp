@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 vector<Vec3b> colors;
-Mat displayImage(Mat, Mat);
+Mat displayImage(Mat, Mat, bool, int);
 int imageId = 1;
 void statsWrite(string, Mat);
 
@@ -49,6 +49,9 @@ Mat combineStats(Mat src, Mat& dst, Mat img, float threshold = 0) {
         int area1 = input.at<int>(i, CC_STAT_AREA);
 
         for (int j = i + 1; j < input.rows; j++) {
+            if (i == 1 && j == 2) {
+                
+            }
             int x2 = input.at<int>(j, CC_STAT_LEFT);
             int y2 = input.at<int>(j, CC_STAT_TOP);
             int w2 = input.at<int>(j, CC_STAT_WIDTH);
@@ -99,9 +102,9 @@ Mat combineStats(Mat src, Mat& dst, Mat img, float threshold = 0) {
                 area1 = area;
 
                 j--; // 复位
-                // displayImage(img, input); // 测试使用
             }
 
+            displayImage(img, input,true, 0);
 
         }
 
@@ -147,11 +150,11 @@ void statsWrite(string filepath, Mat stats) {
     outfile.close();
 }
 
-Mat displayImage(Mat img, Mat stats) {
+// 标记连通域信息，并根据参数展示图片
+Mat displayImage(Mat img, Mat stats, bool is_imshow = false, int showtime = 0) {
     Mat temp_img = img.clone();
     int number = stats.rows;
     sortrows(stats, stats, CC_STAT_AREA);
-    cout << stats << endl;
 
     // 最大连通域是全部图像，因此最大面积或者stats第一行要去除
     for (int i = 1; i < number; i++)
@@ -170,46 +173,32 @@ Mat displayImage(Mat img, Mat stats) {
 
         // 中心位置绘制
         //circle(temp_img, Point(center_x, center_y), 2, Scalar(0, 255, 0), 2, 8, 0);
-        circle(temp_img, Point(center_x, center_y), 2, colors[i], 2, 8, 0);
+        circle(temp_img, Point(center_x, center_y), 2, colors[i], 10, 8, 0); // 半径设置为2 粗度10
         // 外接矩形
         Rect rect(x, y, w, h);
-        rectangle(temp_img, rect, colors[i], 1, 8, 0);
+        rectangle(temp_img, rect, colors[i], 5, 8, 0);
         //putText(temp_img, format("%d", i + 1), Point(center_x, center_y),
         //    FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 255), 1);
         putText(temp_img, format("%d", i), Point(center_x, center_y),
-            FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 1);
-
-        cout << "number: " << i << ",area: " << area <<
-            ",x: " << x <<
-            ",y: " << y <<
-            ",w: " << w <<
-            ",h: " << h << endl;
-
-
+            FONT_HERSHEY_SIMPLEX, 1.5, colors[i], 3);
     }
     //显示结果
     
-    imshow(to_string(imageId++), temp_img);
+    if (is_imshow) {
+		imshow("result-" + to_string(imageId++), temp_img);
+		waitKey(showtime);
+	}
 
-    waitKey(0);
     return temp_img;
 
 }
 
-
+// 使用说明： 可执行文件后的参数应当是不带有/的
 int main(int argc, char **argv)
 {
-    /*
-    Mat src = imread("C:\\Users\\shiwenbo\\OneDrive\\images\\proc.jpg", IMREAD_GRAYSCALE);
-	namedWindow("输入窗口",WINDOW_FREERATIO);
-	imshow("输入窗口", src);
-	waitKey(100000);
-	destroyAllWindows();
-    */
-    // 图片路径
-	// string imagePath = "C:\\Users\\shiwenbo\\OneDrive\\images\\2022-04-21\\2022-04-21T17_00_26+08_00\\";
     string imagePath;
     imagePath = argv[1];
+    imagePath += "\\";
 	
     string imageFileName = "proc.jpg";
 
@@ -228,7 +217,6 @@ int main(int argc, char **argv)
         cout << "请确认图像文件名称是否正确" << endl;
         return -1;
     }
-    imshow(imagePath + imageFileName, img);
 
     Mat leaves, leavesBW;
 
@@ -248,79 +236,22 @@ int main(int argc, char **argv)
         colors.push_back(vec3);
     }
 
-    // 生成文件
-    // 
-    //以不同颜色标记出不同的连通域
-    //Mat result = Mat::zeros(leaves.size(), img.type());
-	
-    //int w = result.cols;
-    //int h = result.rows;
     sortrows(stats, stats, CC_STAT_AREA);
-    cout << stats << endl;
-    
     // 最大连通域是全部图像，因此最大面积或者stats第一行要去除
-    for (int i = 1; i < number; i++)
-    {
-        // 中心位置
-        int center_x = centroids.at<double>(i, 0);
-        int center_y = centroids.at<double>(i, 1);
-        //矩形边框
-        int x = stats.at<int>(i, CC_STAT_LEFT);
-        int y = stats.at<int>(i, CC_STAT_TOP);
-        int w = stats.at<int>(i, CC_STAT_WIDTH);
-        int h = stats.at<int>(i, CC_STAT_HEIGHT);
-        int area = stats.at<int>(i, CC_STAT_AREA);
+    // 保存原始联通情况并显示结果
+    img = displayImage(originImage, stats, true, 0);
+    imwrite(imagePath + "origin_stats.jpg", img);
+    statsWrite(imagePath + "origin_stats.csv", stats);
 
-		
-		// 画框之前先遍历矩阵查找是否存在可以合并的内容
-
-        // 中心位置绘制
-        //circle(img, Point(center_x, center_y), 2, Scalar(0, 255, 0), 2, 8, 0);
-        circle(img, Point(center_x, center_y), 2, colors[i], 2, 8, 0);
-        // 外接矩形
-        Rect rect(x, y, w, h);
-        rectangle(img, rect, colors[i], 1, 8, 0);
-        //putText(img, format("%d", i + 1), Point(center_x, center_y),
-        //    FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 255), 1);
-        putText(img, format("%d", i), Point(center_x, center_y),
-            FONT_HERSHEY_SIMPLEX, 0.5,colors[i], 1);
-
-
-        cout << "number: " << i + 1 << ",area: " << area << endl;
-
-
-		
-        // 新建一个文件流记录数据
-		ofstream outfile;
-		outfile.open(imagePath + "proc.csv", ios::app); // ios::app如果没有文件，生成空文件，如果存在文件，就在文件尾追加
-
-	    outfile << "number: " << i << ",area: " << area  << 
-            ",x: " << x <<
-            ",y: " << y <<
-			",w: " << w <<
-			",h: " << h << endl;
-        outfile.close();
-        
-
-    }
-    //显示结果
-    imshow("标记后的图像", img);
-
-    imwrite(imagePath + "proc2.jpg", img);
-
-    waitKey(0);
-
+    // 进行连通域合并并保存
     Mat temp;
     combineStats(stats, temp,originImage, 0);
     sortrows(temp, temp, CC_STAT_AREA);
     Mat resImg = displayImage(originImage, temp);
     // 保存结果图
-    imwrite(imagePath + "proc3.jpg", resImg);
+    imwrite(imagePath + "combined_stats.jpg", resImg);
     // 保存结果stats联通情况
     statsWrite(imagePath + "combined_stats.csv", temp);
-
-
-	
 
     return 0;
 }
