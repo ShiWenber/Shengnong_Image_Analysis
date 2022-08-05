@@ -150,7 +150,11 @@ void statsWrite(string filepath, Mat stats) {
     outfile.close();
 }
 
+<<<<<<< HEAD
 // 标记连通域信息，并根据参数展示图片
+=======
+// 标记连通域信息，并展示图片
+>>>>>>> 64f775e48e9fd339d52b01f3f4d605e0531e0c4d
 Mat displayImage(Mat img, Mat stats, bool is_imshow = false, int showtime = 0) {
     Mat temp_img = img.clone();
     int number = stats.rows;
@@ -180,7 +184,11 @@ Mat displayImage(Mat img, Mat stats, bool is_imshow = false, int showtime = 0) {
         //putText(temp_img, format("%d", i + 1), Point(center_x, center_y),
         //    FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 255), 1);
         putText(temp_img, format("%d", i), Point(center_x, center_y),
+<<<<<<< HEAD
             FONT_HERSHEY_SIMPLEX, 1.5, colors[i], 3);
+=======
+            FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 1);
+>>>>>>> 64f775e48e9fd339d52b01f3f4d605e0531e0c4d
     }
     //显示结果
     
@@ -239,7 +247,11 @@ int main(int argc, char **argv)
     sortrows(stats, stats, CC_STAT_AREA);
     // 最大连通域是全部图像，因此最大面积或者stats第一行要去除
     // 保存原始联通情况并显示结果
+<<<<<<< HEAD
     img = displayImage(originImage, stats, true, 0);
+=======
+    img = displayImage(originImage, stats);
+>>>>>>> 64f775e48e9fd339d52b01f3f4d605e0531e0c4d
     imwrite(imagePath + "origin_stats.jpg", img);
     statsWrite(imagePath + "origin_stats.csv", stats);
 
