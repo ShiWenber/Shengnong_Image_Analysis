@@ -1,16 +1,12 @@
-# `hello_opencv`
+# Shengnong_Image_Analysis
 
-## 脚本使用
+非常抱歉，此模块中的数据集均采用绝对路径，因此无法直接运行，需要自行修改路径
 
-项目目录下的`*.py`脚本使用方式：
+## Directory Structure
 
-1. 必须放置在需要处理的压缩包的同级目录下执行，例如：
-如果压缩包放在`D:\Pros`目录下，则需要使用
-
-```powershell
-PS D:\Pros> python tarAll.py
+```bash
+Shengnong_Image_Analysis
+├── cpp_projects (visual studio c++ projects)
+├── python (python code)
+└── README.md
 ```
-
-其他几个脚本同样
-
-
