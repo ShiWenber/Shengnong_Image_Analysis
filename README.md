@@ -6,11 +6,14 @@ Cpp部分实现了cpp—opencv的连通域分析和连通域合并，最终将�
 
 Python部分实现了图像数据的按拍摄时间分机位，各机位合成视频，python-opencv基于颜色的图像分割
 
+flask_server部分实现了深度学习图像分割模型的服务化，主要用来从图像中分割出植物叶片，目前仅有叶片，背景二分类的模型
+
 ## Directory Structure
 
 ```bash
 Shengnong_Image_Analysis
 ├── cpp_projects (visual studio c++ projects)
 ├── python (python code)
-└── README.md
+├── flask_server (flask server，深度学习图像分割模型的服务化)
+└── README.mdn
 ```
